@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>DCC104 - Space Shooter</title>
+    <script src="ImageLoader.js" charset="utf-8"></script>
+    <script src="Sprite.js" charset="utf-8"></script>
+    <script src="Level.js" charset="utf-8"></script>
+  </head>
+  <body align = center>
+    <h1>DCC104 - Space Shooter</h1>
+    <canvas style="background: url('back.png'); background-size:cover; background-repeat:no-repeat"></canvas>
+    <script>
+      var eCanvas = document.getElementsByTagName("canvas")[0];
+      eCanvas.width = 400;
+      eCanvas.height = 500;
+      var ctx = eCanvas.getContext("2d");
+
+      var il = new ImageLoader();
+
+      il.load("shot", "shot.png");
+
+      var fps = 120;
+      var atual = new Date();
+      var anterior = new Date();
+      var dt = 1/fps;
+
+
+      var level = new Level();
+
+      level.imageLib = il;
+      level.init(eCanvas.width, eCanvas.height);
+
+      var cannon = new Sprite();
+      cannon.color = "red";
+      cannon.width = 16;
+      cannon.height = 24;
+      cannon.x = level.platCannon.x;
+      cannon.y = level.platCannon.y-level.platCannon.height/2-cannon.height/2+5;
+	    cannon.angle = 180;
+      cannon.minAngle = 90;
+      cannon.maxAngle = 270;
+
+
+      desenha();
+
+      function desenha(){
+        if(level.gameOver==1)return;
+        requestAnimationFrame(desenha);
+        atual = new Date();
+        dt = (atual - anterior)/1000;
+        ctx.clearRect(0,0,eCanvas.width, eCanvas.height);
+        ctx.strokeRect(0,0,eCanvas.width, eCanvas.height);
+
+        level.spawnInimigos(dt);
+
+		    cannon.mover(dt,eCanvas.width, eCanvas.height);
+		    level.mover(dt,eCanvas.width, eCanvas.height);
+
+        level.colidiuComTiros();
+        level.colidiuComPredios();
+
+
+        cannon.desenhar(ctx);
+        level.desenharImg(ctx);
+
+		    level.desenharInfo(ctx)
+        anterior = atual;
+      }
+
+      addEventListener("keydown", function(e){
+        switch (e.keyCode) {
+          case 32:
+            level.fire(cannon);
+            break;
+
+          case 37: // esquerda
+			      cannon.vang = -120
+            break;
+          
+          case 39: // direita
+			       cannon.vang = 120
+            break;
+          
+          default:
+
+        }
+      });
+
+      addEventListener("keyup", function(e){
+        switch (e.keyCode) {
+          case 37:
+			       cannon.vang = 0
+            break;
+          case 38:
+             cannon.vang = 0;
+            break;
+          case 39:
+			       cannon.vang = 0
+            break;
+          case 40:
+            cannon.vang = 0;
+            break;
+          default:
+
+        }
+      });
+
+    </script>
+  </body>
+
+
+
+
+</html>
